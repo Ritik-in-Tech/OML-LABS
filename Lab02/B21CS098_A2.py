@@ -4,7 +4,7 @@
 # ### Helper function and imports
 # 
 
-# In[65]:
+# In[55]:
 
 
 import numpy as np
@@ -15,7 +15,7 @@ def solveMin(c,A,b):
     print(np.round_(soln['x'],decimals=5),soln['primal objective'])
 
 
-# In[66]:
+# In[56]:
 
 
 import numpy as np
@@ -31,7 +31,7 @@ def solveMax(c,A,b):
 # ![image.png](attachment:image.png)
 # 
 
-# In[67]:
+# In[57]:
 
 
 c=np.array([[3],[-4]])
@@ -47,7 +47,7 @@ solveMin(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[68]:
+# In[58]:
 
 
 A=np.array([[1 ,1],[-1,0],[0,-1]])
@@ -61,7 +61,7 @@ solveMax(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[90]:
+# In[59]:
 
 
 # Let Xl,Xd be the number of liquid product jars and the number of dry products respectively
@@ -74,7 +74,6 @@ solveMax(c,A,b)
 A  = np.array( [[-5,-1],[-2,-2], [-1,-4],[-1 ,0 ],[0,-1]])
 b = np.array( [[-10],[-12],[-12],[0],[0] ])
 c = np.array( [ [30],[20] ])
-
 solveMin(c,A,b)
 
 
@@ -83,21 +82,12 @@ solveMin(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[88]:
+# In[60]:
 
 
-# Let x1,x2,x3,x4,x5 for the parts 1 to 5 respectively
-# 2x1+x2+3x3+3x4+x5<=700
-# 3x1+2x2+2x3+x4+x5<=1000
-
-# x1,x2,x3,x4,x5>=0
-
-# max 30x1+20x2+40x3+25x4+10x5
-
-A=np.array([[2,1,3,3,1],[3,2,2,1,1],[-1,0,0,0,0],[0,-1,0,0,0],[0,0,-1,0,0],[0,0,0,0,-1],[0,0,0,0,-1]])
-b=np.array([[700],[1000],[0],[0],[0],[0],[0]])
-c=np.array([[-30],[-20],[-40],[-25],[-10]])
-
+A  = matrix( [ [ 2 , 3  ,  -1  , 0 , 0 ,0 , 0 ] , [1 , 2 , 0 ,-1 , 0 ,0 , 0  ] , [ 3 , 2 , 0 , 0, -1 ,0 , 0] , [ 3 , 1 , 0 , 0 ,0 , -1 , 0] , [ 1 , 1 , 0 ,0 ,0 ,0 , -1 ]])
+b = matrix( [700,1000 , 0 , 0 , 0 , 0 , 0  ])
+c = matrix( [ -30 , -20 ,-40,-25 , -10  ])
 solveMax(c,A,b)
 
 
@@ -106,7 +96,7 @@ solveMax(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[87]:
+# In[61]:
 
 
 # Let Xa, Xb, Xc be the clothes of type A,B,C
@@ -129,7 +119,7 @@ solveMax(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[70]:
+# In[62]:
 
 
 R=98
@@ -144,7 +134,7 @@ solveMin(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[71]:
+# In[63]:
 
 
 R=98
@@ -159,7 +149,7 @@ solveMin(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[72]:
+# In[64]:
 
 
 c=np.array([[-1],[-1],[-1]])
@@ -174,7 +164,7 @@ solveMax(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[73]:
+# In[65]:
 
 
 R=98
@@ -190,7 +180,7 @@ solveMax(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[74]:
+# In[66]:
 
 
 c = np.array([[2], [3], [10]])
@@ -208,7 +198,7 @@ solveMin(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[75]:
+# In[67]:
 
 
 R=98
@@ -224,7 +214,7 @@ solveMax(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[76]:
+# In[68]:
 
 
 R=98
@@ -239,7 +229,7 @@ soln=solvers.lp(matrix(c,tc='d'),matrix(A,tc='d'),matrix(b,tc='d'))
 # ![image.png](attachment:image.png)
 # 
 
-# In[77]:
+# In[69]:
 
 
 R=98
@@ -255,7 +245,7 @@ solveMin(c,A,b)
 # ![image.png](attachment:image.png)
 # 
 
-# In[78]:
+# In[70]:
 
 
 A=np.array([[1,2],[-1,-2],[2,-2],[-2,2],[-1,0],[0,-1]])
