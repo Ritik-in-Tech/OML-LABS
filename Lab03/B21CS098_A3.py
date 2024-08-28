@@ -4,7 +4,7 @@
 # ### important library imports
 # 
 
-# In[121]:
+# In[206]:
 
 
 import numpy as np
@@ -15,7 +15,7 @@ from cvxopt import solvers
 # ### Helper function to check linear independence
 # 
 
-# In[122]:
+# In[207]:
 
 
 def check_linear_independence(matrix):
@@ -30,7 +30,7 @@ def check_linear_independence(matrix):
 # ### Question 1 (part a)
 # 
 
-# In[123]:
+# In[208]:
 
 
 R=98
@@ -52,7 +52,7 @@ else:
 # ### Helper function to check the linear independence from the csv files given
 # 
 
-# In[124]:
+# In[209]:
 
 
 def check_linear_independence_from_csv(file_path):
@@ -68,7 +68,7 @@ def check_linear_independence_from_csv(file_path):
 # ### Question 1 (part b)
 # 
 
-# In[125]:
+# In[210]:
 
 
 file_path="./A1.csv"
@@ -81,7 +81,7 @@ else:
 # ### Question 1 (part c)
 # 
 
-# In[126]:
+# In[211]:
 
 
 data = pd.read_csv("./A2.csv")
@@ -97,7 +97,7 @@ else:
 # ### Question 1 (part d)
 # 
 
-# In[127]:
+# In[212]:
 
 
 file_path=("./A3.csv")
@@ -110,7 +110,7 @@ else:
 # ### Helper function to solve the minimization problem of question 2
 # 
 
-# In[128]:
+# In[213]:
 
 
 def solve_least_squares(A, b):
@@ -128,7 +128,7 @@ def solve_least_squares(A, b):
 # ### Question 2 (part 1)
 # 
 
-# In[129]:
+# In[214]:
 
 
 r = 8
@@ -141,7 +141,7 @@ print("The solution x is:", x_solution)
 # ### Question 2 (part 2)
 # 
 
-# In[130]:
+# In[215]:
 
 
 df=pd.read_csv("./Ab1.csv")
@@ -154,7 +154,7 @@ print("The solution x is:", x_solution)
 # ### Question 2 (part 3)
 # 
 
-# In[131]:
+# In[216]:
 
 
 df=pd.read_csv("./Ab2.csv")
@@ -167,7 +167,7 @@ print("The solution x is:", x_solution)
 # ### Question 2 (part 4)
 # 
 
-# In[132]:
+# In[217]:
 
 
 df=pd.read_csv("./Ab3.csv")
@@ -181,7 +181,7 @@ print("The solution x is:", x_solution)
 # ### Question 3
 # 
 
-# In[133]:
+# In[218]:
 
 
 from cvxopt import matrix
@@ -201,7 +201,7 @@ print(f"Final value of the objective function: {objective_value}")
 # ### Question 4
 # 
 
-# In[134]:
+# In[219]:
 
 
 P = matrix([[1.0, 0.0], [0.0, 0.0]])
@@ -220,14 +220,14 @@ print(f"Final value of the objective function: {objective_value}")
 # ### Question 5 (part 1)
 # 
 
-# In[135]:
+# In[220]:
 
 
 file_path = './Ab1.csv'
 data = pd.read_csv(file_path, header=None, skiprows=1).values
 A = data[:, :-1]
 b = data[:, -1]
-R = 8.0
+R = 98.0
 P = matrix(A.T @ A)
 q = matrix(-A.T @ b)
 G = matrix(np.ones((1, A.shape[1])))
@@ -247,7 +247,7 @@ print(f"Final value of the objective function: {objective_value}")
 # ### Question 5 (part 2)
 # 
 
-# In[136]:
+# In[221]:
 
 
 file_path = './Ab2.csv'
