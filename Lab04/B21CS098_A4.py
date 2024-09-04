@@ -4,22 +4,22 @@
 # ### Constants and Imports
 # 
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import xlrd
+# import xlrd
 R=98  # Last two digit of rollNumber
-r=8  # Last Digit of rollNumber
+r=8 # Last Digit of rollNumber
 W=70  # Weight 
 
 
 # #### Question1
 # 
 
-# In[ ]:
+# In[2]:
 
 
 class solution:
@@ -50,6 +50,7 @@ class solution:
 
 data = pd.read_excel('regr.xlsx')
 data.at[0, 'rating'] = R / 10
+# print(data)
 B = data.values
 x,y = B[:,0], B[:,1]
 
@@ -75,7 +76,7 @@ print()
 # ### Question2
 # 
 
-# In[ ]:
+# In[3]:
 
 
 df = pd.read_csv('./training_dataSUB.csv')
@@ -94,7 +95,7 @@ print(f"Predicted Result for (Value1=10.25R, Value2=R+10): {predicted_result}")
 # ### Question3
 # 
 
-# In[ ]:
+# In[4]:
 
 
 def sigmoid(z):
@@ -115,7 +116,7 @@ def gradient_descent(X, Y, theta, alpha, iterations):
     return theta
 
 
-# In[ ]:
+# In[5]:
 
 
 df=pd.read_excel('./Wine_Dataset.xlsx')
@@ -143,7 +144,7 @@ print(f"Predicted Alcohol Class: {int(predicted_class[0])}")
 # #### Question4
 # 
 
-# In[ ]:
+# In[6]:
 
 
 df=pd.read_excel("./train.xlsx")
@@ -163,7 +164,7 @@ print(f"Predicted Price: {predicted_price}")
 # #### Question 5
 # 
 
-# In[ ]:
+# In[7]:
 
 
 df=pd.read_excel("./Mastercard_stock_history.xlsx")
@@ -183,7 +184,7 @@ print(f"Predicted Volume: {predicted_volume}")
 # #### Question 6
 # 
 
-# In[ ]:
+# In[8]:
 
 
 data = pd.read_excel('./Automobile.xlsx')
@@ -228,7 +229,7 @@ print("predicted mpg:",y)
 # ##### log_exp= C\*x + y
 # 
 
-# In[ ]:
+# In[9]:
 
 
 df=pd.read_csv("./covid.csv")
@@ -265,7 +266,7 @@ print(f"Predicted Deaths for India: {predicted_deaths_india}")
 # #### Question 8
 # 
 
-# In[ ]:
+# In[10]:
 
 
 df=pd.read_csv('./Census data (Chandigarh).csv')
