@@ -4,7 +4,7 @@
 # ### Import code
 # 
 
-# In[23]:
+# In[11]:
 
 
 import numpy as np
@@ -15,7 +15,7 @@ import numpy as np
 # ![image.png](attachment:image.png)
 # 
 
-# In[24]:
+# In[15]:
 
 
 # Define the fucntion given
@@ -66,7 +66,7 @@ def descent_method(x0, r1, beta1, r, epsilon, max_iter):
         beta1 *= r
         
         iter_count += 1
-        func_evals += 1   
+        func_evals += 2   
         grad_evals += 1   
     
     return x, iter_count, func_evals, grad_evals
@@ -95,7 +95,7 @@ print(f"Final gradient norm: {np.linalg.norm(gradient_f(result, r1))}")
 # ![image.png](attachment:image.png)
 # 
 
-# In[25]:
+# In[17]:
 
 
 # Define the function given same as the first question
@@ -153,7 +153,7 @@ def descent_method(x0, r1, beta1, r, epsilon, max_iter, method):
         beta1 *= r
         
         iter_count += 1
-        func_evals += 1   
+        func_evals += 2   
         grad_evals += 1   
     
     return x, iter_count, func_evals, grad_evals
@@ -172,6 +172,8 @@ result_B_inv, iterations_B_inv, func_evals_B_inv, grad_evals_B_inv = descent_met
 
 print("Results for d^k = -B^(-1)∇f(x^k):")
 print(f"iteration count: {iterations_B_inv}")
+print(f"number of function evaluations: {func_evals_B_inv}")
+print(f"number of grad evaluations: {grad_evals_B_inv}")
 
 
 
@@ -182,6 +184,8 @@ result_B, iterations_B, func_evals_B, grad_evals_B = descent_method(x0, r1, beta
 
 print("Results for d^k = -B∇f(x^k):")
 print(f"iteration count: {iterations_B}")
+print(f"number of function evaluations: {func_evals_B}")
+print(f"number of grad evaluations: {grad_evals_B}")
 
 print("\n" + "="*50 + "\n")
 
@@ -194,7 +198,7 @@ print(f"B^(-1) method takes {'less' if iterations_B_inv < iterations_B else 'mor
 # ![image.png](attachment:image.png)
 # 
 
-# In[26]:
+# In[18]:
 
 
 # Define the given function 
@@ -284,7 +288,7 @@ print(f"The {'Gradient Descent' if iters_grad < iters_B_inv else 'B^(-1) Method'
 # ![image.png](attachment:image.png)
 # 
 
-# In[27]:
+# In[19]:
 
 
 # Define the given function as mentioned in the question
