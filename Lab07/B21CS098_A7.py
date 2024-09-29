@@ -1,88 +1,83 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ### Question01
+# ### Import libraries
 # 
 
-# In[7]:
+# In[25]:
 
 
 import numpy as np
-def f(x): # Objective function
-    x1, x2 = x
-    return (1 - x1)**2 + (x2 - x1**2)**2
+import pandas as pd
+from scipy.optimize import minimize
+from scipy.special import expit
 
-def grad_f(x): # Gradient of the objective function
-    x1, x2 = x
-    df_dx1 = -2 * (1 - x1) - 4 * x1 * (x2 - x1**2)
-    df_dx2 = 2 * (x2 - x1**2)
+
+# ### Question1
+
+# In[26]:
+
+
+def f(x):
+    return (1 - x[0])**2 + (x[1] - x[0]**2)**2
+
+def grad_f(x):
+    df_dx1 = -2 * (1 - x[0]) - 4 * x[0] * (x[1] - x[0]**2)
+    df_dx2 = 2 * (x[1] - x[0]**2)
     return np.array([df_dx1, df_dx2])
 
-def hessian_f(x): # Hessian of the objective function
-    x1, x2 = x
-    d2f_dx1x1 = 2 - 4 * (x2 - x1**2) + 8 * x1**2
-    d2f_dx1x2 = -4 * x1
-    d2f_dx2x2 = 2
-    return np.array([[d2f_dx1x1, d2f_dx1x2], [d2f_dx1x2, d2f_dx2x2]])
+def hessian_f(x):
+    h11 = 2 - 4 * (x[1] - 3 * x[0]**2)
+    h12 = -4 * x[0]
+    h21 = h12
+    h22 = 2
+    return np.array([[h11, h12], [h21, h22]])
 
-def backtracking_line_search(f, grad_f, x, p, alpha=0.3, beta=0.8): # Inexact line search using backtracking
-    t = 1
-    while f(x + t * p) > f(x) + alpha * t * np.dot(grad_f(x), p):
-        t *= beta
-    return t
+def calculate_grad_hess(x, L):
+    return grad_f(x), hessian_f(x)
 
-def modified_newton_method(f, grad_f, hessian_f, x0, tol=1e-4, max_iter=2000): # Modified Newton's method
-    x = np.array(x0)
-    for i in range(max_iter):
-        grad = grad_f(x)
-        hess = hessian_f(x)
+def gradient(L, x):
+    return grad_f(x)
 
-        # Check the stopping criterion
-        grad_norm = np.linalg.norm(grad)
-        if grad_norm < tol:
-            print(f'Converged in {i} iterations.')
-            return x, f(x)
+def newton_method(L, A, max_iterations=2000):
+    x0 = [0, 3]
 
-        # Check if Hessian is positive definite using Cholesky decomposition
+    itr = 0
+    while not (np.linalg.norm(gradient(L, x0)) < 1e-4 or itr >= max_iterations):
+        grad, hess = calculate_grad_hess(x0, L)
         try:
-            np.linalg.cholesky(hess)
+            d = -np.linalg.solve(hess, grad)
         except np.linalg.LinAlgError:
-            return "Hessian matrix is not positive definite"
-        
-        # Compute the Newton direction
-        p = -np.linalg.solve(hess, grad)
-        
-        # Perform backtracking line search
-        t = backtracking_line_search(f, grad_f, x, p)
-        
-        # Update the solution
-        x = x + t * p
-    
-    print('Maximum iterations reached.')
-    return x, f(x)
+            hess = hess + np.eye(2) * 1e-4
+            d = -np.linalg.solve(hess, grad)
 
-x0 = [0, 3] # Initial approximation
+        x0 = x0 + d
 
- 
-result = modified_newton_method(f, grad_f, hessian_f, x0) # Run the modified Newton method
+        print(f'for iteration: {itr+1}')
+        print(f'x0 value: {x0}')
+        print(f'function evaluation: {L(x0)}')
+        print(f'gradient evaluation: {gradient(L, x0)}')
+        print()
 
-if isinstance(result, str):
-    print(result)
-else:
-    solution, f_value = result
-    print(f"Solution: {solution}")
-    print(f"Function value at the solution: {f_value}")
+        itr += 1
+
+    return x0, L(x0)
+
+
+A = np.array([[1, 0], [0, 1]])
+
+solution, final_value = newton_method(f, A)
+
+print("Solution:", solution)
+print("Function value at solution:", final_value)
 
 
 # ### Question02
 # 
 
-# In[8]:
+# In[27]:
 
 
-import numpy as np
-import pandas as pd
-from scipy.special import expit   
 from numpy.linalg import LinAlgError
 
 data =pd.read_csv('../Lab06/diabetes2.csv') # Load the dataset
@@ -155,203 +150,135 @@ else:
 # ### Question03
 # 
 
-# In[9]:
+# In[28]:
 
 
-import numpy as np
-from numpy.linalg import LinAlgError
-
-# Sample dataset
-data = pd.read_csv('./Customer Purchasing Behaviors.csv')
-
-# Extract loyalty score (x) and purchase frequency (y)
-x = data['loyalty_score'].values
-y = data['purchase_frequency'].values
-
-# Define the model for purchase frequency
-def model(theta, x):
+def purchase_frequency(x, theta):
     theta1, theta2, theta3 = theta
     return np.exp(theta1 * x) * (np.cos(theta2 * x) + np.sin(theta3 * x))
 
-# Loss function (squared error)
-def loss_function(theta, x, y):
-    y_pred = model(theta, x)
-    return np.sum((y - y_pred) ** 2)
+def mse_loss(X, y, theta, lambda_reg=0.01):
+    y_pred = purchase_frequency(X, theta)
+    loss = np.mean((y - y_pred) ** 2)
+    reg_term = lambda_reg * np.sum(theta**2)
+    return loss + reg_term
 
-# Gradient of the loss function
-def grad_loss_function(theta, x, y):
+def gradient(X, y, theta):
     theta1, theta2, theta3 = theta
-    y_pred = model(theta, x)
-    error = y - y_pred
-    
-    # Partial derivatives
-    dtheta1 = -2 * np.sum(error * (x * np.exp(theta1 * x)) * (np.cos(theta2 * x) + np.sin(theta3 * x)))
-    dtheta2 = -2 * np.sum(error * np.exp(theta1 * x) * (-x * np.sin(theta2 * x)))
-    dtheta3 = -2 * np.sum(error * np.exp(theta1 * x) * (x * np.cos(theta3 * x)))
-    
-    return np.array([dtheta1, dtheta2, dtheta3])
+    y_pred = purchase_frequency(X, theta)
+    residual = y_pred - y
+    grad_theta1 = np.mean(2 * residual * y_pred * X)
+    grad_theta2 = np.mean(2 * residual * (-y_pred * np.sin(theta2 * X) * X))
+    grad_theta3 = np.mean(2 * residual * (y_pred * np.cos(theta3 * X) * X))
+    return np.array([grad_theta1, grad_theta2, grad_theta3])
 
-# Hessian of the loss function
-def hessian_loss_function(theta, x, y):
+def hessian(X, theta):
     theta1, theta2, theta3 = theta
-    y_pred = model(theta, x)
-    error = y - y_pred
-    
-    # Second order partial derivatives
-    d2theta1 = 2 * np.sum((x ** 2) * np.exp(2 * theta1 * x) * (np.cos(theta2 * x) + np.sin(theta3 * x)) ** 2)
-    d2theta2 = 2 * np.sum(error * np.exp(theta1 * x) * (x ** 2) * np.cos(theta2 * x))
-    d2theta3 = 2 * np.sum(error * np.exp(theta1 * x) * (x ** 2) * -np.sin(theta3 * x))
-    
-    # Cross partial derivatives
-    dtheta1theta2 = 2 * np.sum(error * x * np.exp(theta1 * x) * (-x * np.sin(theta2 * x)))
-    dtheta1theta3 = 2 * np.sum(error * x * np.exp(theta1 * x) * (x * np.cos(theta3 * x)))
-    dtheta2theta3 = 2 * np.sum(error * np.exp(theta1 * x) * (-x ** 2 * np.sin(theta2 * x) * np.cos(theta3 * x)))
-    
-    # Hessian matrix
-    hess = np.array([
-        [d2theta1, dtheta1theta2, dtheta1theta3],
-        [dtheta1theta2, d2theta2, dtheta2theta3],
-        [dtheta1theta3, dtheta2theta3, d2theta3]
-    ])
-    
-    return hess
+    y_pred = purchase_frequency(X, theta)
+    H = np.zeros((3, 3))
+    H[0, 0] = np.mean(2 * (X ** 2) * y_pred**2)
+    H[1, 1] = np.mean(2 * (X ** 2) * y_pred**2 * np.sin(theta2 * X)**2)
+    H[2, 2] = np.mean(2 * (X ** 2) * y_pred**2 * np.cos(theta3 * X)**2)
+    return H
 
-# Modified Newton's method
-def modified_newton(x, y, tol=1e-4, max_iter=100):
-    theta = np.zeros(3)  # Initialize theta1, theta2, theta3
-    
+def newton_method(X, y, tol=1e-4, max_iter=100):
+    theta = np.array([0.5, 0.5, 0.5])
     for i in range(max_iter):
-        grad = grad_loss_function(theta, x, y)
-        hess = hessian_loss_function(theta, x, y)
-        
-        # Check if the gradient norm is small enough (stopping criterion)
-        if np.linalg.norm(grad) < tol:
-            print(f'Converged in {i} iterations.')
-            return theta
-        
-        # Check if the Hessian is positive definite
+        grad = gradient(X, y, theta)
+        H = hessian(X, theta)
         try:
-            np.linalg.cholesky(hess)
-        except LinAlgError:
-            print("Hessian matrix is not positive definite.")
-            return None
-        
-        # Update the parameters using Newton's method
-        delta_theta = np.linalg.solve(hess, grad)
-        theta = theta - delta_theta
-    
-    print("Maximum iterations reached.")
+            delta_theta = np.linalg.solve(H, -grad)
+        except np.linalg.LinAlgError:
+            H = H + np.eye(3) * 1e-4
+            delta_theta = np.linalg.solve(H, -grad)
+        theta = theta + delta_theta
+        if np.linalg.norm(grad) < tol:
+            print(f"Converged in {i+1} iterations.")
+            break
     return theta
 
-# Apply the modified Newton method
-theta_optimal = modified_newton(x, y)
+df = pd.read_csv('Customer Purchasing Behaviors.csv')
+X = df['loyalty_score'].values
+y = df['purchase_frequency'].values
 
-# If optimization succeeded, estimate purchase frequency for R/10 + 1 where R = 98
-if theta_optimal is not None:
-    R = 98
-    x_new = R / 10 + 1
-    purchase_frequency_estimate = model(theta_optimal, x_new)
-    print(f"Estimated purchase frequency for loyalty score {x_new}: {purchase_frequency_estimate}")
-else:
-    print("Optimization failed.")
+optimal_theta = newton_method(X, y)
+
+print("Optimal theta values:", optimal_theta)
+
+R = 98 # last 2 digits of roll no.
+x_test = R / 10 + 1
+y_estimate = purchase_frequency(x_test, optimal_theta)
+
+print(f"Estimated purchase frequency for x = {x_test}: {y_estimate}")
 
 
 # ### Question04
 # 
 
-# In[10]:
+# In[29]:
 
 
-import numpy as np
-import pandas as pd
+def logistic_function(x1, x2, beta1, beta2):
+    z = beta1 * x1 + beta2 * x2
+    z_clipped = np.clip(z, -500, 500)
+    return np.exp(z_clipped) / (1 + np.exp(z_clipped))
 
-def load_data_from_csv(file_path): # Load the CSV file using pandas
-    data = pd.read_csv(file_path)
-    x1 = data['x1'].values
-    x2 = data['x2'].values
-    y = data['Y'].values
-    return x1, x2, y
-
-def model(beta, x1, x2): # Define the model for prediction
+def total_error(beta, X1, X2, y):
     beta1, beta2 = beta
-    exp_term = np.exp(beta1 * x1 + beta2 * x2)
-    return exp_term / (1 + exp_term)
+    predictions = logistic_function(X1, X2, beta1, beta2)
+    return np.sum((predictions - y) ** 2)
 
-
-def loss_function(beta, x1, x2, y): # Loss function (squared error)
-    y_pred = model(beta, x1, x2)
-    return np.sum((y - y_pred) ** 2)
-
- 
-def grad_loss_function(beta, x1, x2, y): # Gradient of the loss function
+def gradient(beta, X1, X2, y):
     beta1, beta2 = beta
-    y_pred = model(beta, x1, x2)
-    error = y - y_pred
-    
-    # Partial derivatives
-    d_beta1 = -2 * np.sum(error * (x1 * y_pred * (1 - y_pred)))
-    d_beta2 = -2 * np.sum(error * (x2 * y_pred * (1 - y_pred)))
-    
-    return np.array([d_beta1, d_beta2])
+    predictions = logistic_function(X1, X2, beta1, beta2)
 
-# Hessian of the loss function
-def hessian_loss_function(beta, x1, x2, y):
+    grad_beta1 = 2 * np.sum((predictions - y) * predictions * (1 - predictions) * X1)
+    grad_beta2 = 2 * np.sum((predictions - y) * predictions * (1 - predictions) * X2)
+
+    return np.array([grad_beta1, grad_beta2])
+
+def hessian(beta, X1, X2, y):
     beta1, beta2 = beta
-    y_pred = model(beta, x1, x2)
-    error = y - y_pred
-    
-    # Second order partial derivatives
-    d2_beta1 = 2 * np.sum((x1 ** 2) * y_pred * (1 - y_pred) * (1 - 2 * y_pred))
-    d2_beta2 = 2 * np.sum((x2 ** 2) * y_pred * (1 - y_pred) * (1 - 2 * y_pred))
-    
-    # Cross partial derivatives
-    d_beta1_beta2 = 2 * np.sum(x1 * x2 * y_pred * (1 - y_pred) * (1 - 2 * y_pred))
-    
-    # Hessian matrix
-    hess = np.array([
-        [d2_beta1, d_beta1_beta2],
-        [d_beta1_beta2, d2_beta2]
-    ])
-    
-    return hess
+    predictions = logistic_function(X1, X2, beta1, beta2)
 
-# Modified Newton's method
-def modified_newton(x1, x2, y, tol=1e-4, max_iter=100):
-    beta = np.zeros(2)  # Initialize beta1 and beta2
-    
-    for i in range(max_iter):
-        grad = grad_loss_function(beta, x1, x2, y)
-        hess = hessian_loss_function(beta, x1, x2, y)
-        
-        # Check if the gradient norm is small enough (stopping criterion)
-        if np.linalg.norm(grad) < tol:
-            print(f'Converged in {i} iterations.')
-            return beta
-        
-        try:
-            delta_beta = np.linalg.solve(hess, grad)
-            beta = beta - delta_beta
-        except:
-            print(f"Singular matrix encountered at iteration {i}.")
-            return None
-    
-    print("Maximum iterations reached.")
+    hess_beta1_beta1 = 2 * np.sum(predictions * (1 - predictions) * (1 - 2 * predictions) * X1**2)
+    hess_beta2_beta2 = 2 * np.sum(predictions * (1 - predictions) * (1 - 2 * predictions) * X2**2)
+    hess_beta1_beta2 = 2 * np.sum(predictions * (1 - predictions) * (1 - 2 * predictions) * X1 * X2)
+
+    return np.array([[hess_beta1_beta1, hess_beta1_beta2], [hess_beta1_beta2, hess_beta2_beta2]])
+
+def modified_newton_method(X1, X2, y, beta_init, max_iters=1000, tol=1e-4):
+    converged = False
+    iteration = 0
+    beta = beta_init.copy()
+    while not converged and iteration < max_iters:
+        grad = gradient(beta, X1, X2, y)
+        hess = hessian(beta, X1, X2, y)
+
+        hess += np.eye(2) * 1e-4
+
+        delta_beta = np.linalg.solve(hess, -grad)
+        beta += delta_beta
+
+        if np.linalg.norm(delta_beta) < tol:
+            converged = True
+            print(f"Converged after {iteration + 1} iterations.")
+
+        iteration += 1
+
+    if not converged:
+        print(f"Did not converge within {max_iters} iterations.")
+
     return beta
 
-# Main function to load data, run optimization, and estimate beta values
-def main(csv_file_path):
-    # Load data from the given CSV file
-    x1, x2, y = load_data_from_csv(csv_file_path)
-    
-    # Apply the modified Newton method
-    beta_optimal = modified_newton(x1, x2, y)
-    
-    if beta_optimal is not None:
-        print(f"Optimal beta values: {beta_optimal}")
-    else:
-        print("Optimization failed.")
+data = pd.read_csv('new data.csv')
 
-# Run the main function with the path to your CSV file
-csv_file_path = './new data.csv'  # Replace with the actual file path
-main(csv_file_path)
+Y = data['Y'].values
+X1 = data['x1'].values
+X2 = data['x2'].values
+
+beta_init = np.array([0.0, 0.0])
+
+beta_optimal = modified_newton_method(X1, X2, Y, beta_init)
+print(f"Optimal beta values: {beta_optimal}")
 
