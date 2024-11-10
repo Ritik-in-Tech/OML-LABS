@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ### Question 1
-# 
-
 # ### Helper Code
 # 
 
-# In[22]:
+# In[42]:
 
 
 import numpy as np
@@ -31,7 +28,9 @@ beta_1, beta_2 = np.random.rand(2)
 learning_rate = 0.01
 
 
-# In[23]:
+# ### Question 1
+
+# In[43]:
 
 
 def loss_function(beta_1, beta_2, x, y):
@@ -75,7 +74,7 @@ print("Final loss:", final_loss)
 # ### Question 2
 # 
 
-# In[24]:
+# In[44]:
 
 
 def loss_function(beta_1, beta_2, x, y):
@@ -119,7 +118,7 @@ print("Final loss:", final_loss)
 # ### Question 3
 # 
 
-# In[25]:
+# In[45]:
 
 
 batch_size = 10  
@@ -172,7 +171,7 @@ print("Final loss:", final_loss)
 # ### Question 4
 # 
 
-# In[26]:
+# In[46]:
 
 
 beta_0, beta_1, beta_2 = np.random.rand(3)
@@ -215,13 +214,117 @@ final_loss = loss_function(beta_0, beta_1, beta_2, x, y)
 print("Final loss:", final_loss)
 
 
-# ### Question 5 and Question 6 are same as Question 2 and Question 3
+# ### Question 5
 # 
+
+# In[47]:
+
+
+def sgd_quadratic_fit(x, y, learning_rate=0.001, tolerance=0.01, max_iterations=1000):
+    N = len(x)
+    beta_0, beta_1, beta_2 = np.random.rand(3)
+    
+    def compute_gradients_single_point(beta_0, beta_1, beta_2, x_i, y_i):
+        prediction = beta_2 * x_i**2 + beta_1 * x_i + beta_0
+        error = prediction - y_i
+        grad_beta_0 = error
+        grad_beta_1 = error * x_i
+        grad_beta_2 = error * x_i**2
+        return grad_beta_0, grad_beta_1, grad_beta_2
+    
+    for iteration in range(max_iterations):
+         
+        idx = np.random.randint(0, N)
+        x_i, y_i = x[idx], y[idx]
+        
+         
+        grad_beta_0, grad_beta_1, grad_beta_2 = compute_gradients_single_point(
+            beta_0, beta_1, beta_2, x_i, y_i
+        )
+        
+         
+        beta_0 -= learning_rate * grad_beta_0
+        beta_1 -= learning_rate * grad_beta_1
+        beta_2 -= learning_rate * grad_beta_2
+        
+      
+        full_grad_beta_0 = np.mean((beta_2 * x**2 + beta_1 * x + beta_0 - y))
+        full_grad_beta_1 = np.mean((beta_2 * x**2 + beta_1 * x + beta_0 - y) * x)
+        full_grad_beta_2 = np.mean((beta_2 * x**2 + beta_1 * x + beta_0 - y) * x**2)
+        
+        gradient_magnitude = np.sqrt(full_grad_beta_0**2 + full_grad_beta_1**2 + full_grad_beta_2**2)
+        
+        if gradient_magnitude < tolerance:
+            print(f"SGD converged after {iteration + 1} iterations.")
+            break
+            
+    return beta_0, beta_1, beta_2
+
+
+print("\nStochastic Gradient Descent Results:")
+beta_0_sgd, beta_1_sgd, beta_2_sgd = sgd_quadratic_fit(x, y)
+print("Optimal β0 (intercept):", beta_0_sgd)
+print("Optimal β1 (linear coefficient):", beta_1_sgd)
+print("Optimal β2 (quadratic coefficient):", beta_2_sgd)
+
+
+# ### Question 6
+# 
+
+# In[48]:
+
+
+def mini_batch_gradient_descent(x, y, batch_size=10, learning_rate=0.001, tolerance=0.01, max_iterations=1000):
+    N = len(x)
+    beta_0, beta_1, beta_2 = np.random.rand(3)
+    
+    def compute_gradients_batch(beta_0, beta_1, beta_2, x_batch, y_batch):
+        predictions = beta_2 * x_batch**2 + beta_1 * x_batch + beta_0
+        error = predictions - y_batch
+        grad_beta_0 = np.mean(error)
+        grad_beta_1 = np.mean(error * x_batch)
+        grad_beta_2 = np.mean(error * x_batch**2)
+        return grad_beta_0, grad_beta_1, grad_beta_2
+    
+    for iteration in range(max_iterations):
+     
+        batch_indices = np.random.choice(N, batch_size, replace=False)
+        x_batch = x[batch_indices]
+        y_batch = y[batch_indices]
+      
+        grad_beta_0, grad_beta_1, grad_beta_2 = compute_gradients_batch(
+            beta_0, beta_1, beta_2, x_batch, y_batch
+        )
+        
+    
+        beta_0 -= learning_rate * grad_beta_0
+        beta_1 -= learning_rate * grad_beta_1
+        beta_2 -= learning_rate * grad_beta_2
+        
+        full_grad_beta_0 = np.mean((beta_2 * x**2 + beta_1 * x + beta_0 - y))
+        full_grad_beta_1 = np.mean((beta_2 * x**2 + beta_1 * x + beta_0 - y) * x)
+        full_grad_beta_2 = np.mean((beta_2 * x**2 + beta_1 * x + beta_0 - y) * x**2)
+        
+        gradient_magnitude = np.sqrt(full_grad_beta_0**2 + full_grad_beta_1**2 + full_grad_beta_2**2)
+        
+        if gradient_magnitude < tolerance:
+            print(f"Mini-batch GD converged after {iteration + 1} iterations.")
+            break
+            
+    return beta_0, beta_1, beta_2
+
+
+print("\nMini-batch Gradient Descent Results:")
+beta_0_mb, beta_1_mb, beta_2_mb = mini_batch_gradient_descent(x, y)
+print("Optimal β0 (intercept):", beta_0_mb)
+print("Optimal β1 (linear coefficient):", beta_1_mb)
+print("Optimal β2 (quadratic coefficient):", beta_2_mb)
+
 
 # ### Question 7
 # 
 
-# In[27]:
+# In[49]:
 
 
 import numpy as np
