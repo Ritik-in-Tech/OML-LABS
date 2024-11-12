@@ -4,7 +4,7 @@
 # ## Question 1
 # 
 
-# In[ ]:
+# In[1]:
 
 
 import numpy as np
@@ -22,10 +22,10 @@ def grad_f(x):
 
 
 r = 8  # Last digit of my roll number (B21CS098)
-x0 = np.array([2 + r / 10, 3 - r / 10, 6])  # Initial point
+x0 = np.array([2 + r / 10, 3 - r / 10, 6])  # Initial point as given in the question
 tol = 1e-4  # Tolerance for stopping criteria ( given in the question)
 max_iter = 1000  # Maximum number of iterations (I am assuming this)
-alpha = 1e-1  # Initial step size for line search
+alpha = 1e-1  # Initial step size for line search (I have assumed this)
 
 
 x = x0
@@ -51,7 +51,7 @@ print("Gradient norm at optimal point:", grad_norm)
 # ## Question 2
 # 
 
-# In[9]:
+# In[2]:
 
 
 import numpy as np
@@ -60,11 +60,11 @@ data = pd.read_csv("multiple_linear_regression_dataset - Copy (1).csv")
 X = data[['age', 'experience']].values
 y = data['Income'].values
 R = 98  # R=B21CS098 ( As 98 is my last digit of the rollNumber)
-lambda_reg = abs(R) / 100 - 0.5  
-alpha = np.array([1.0, 1.0]) 
-tol = 1e-4 
-max_iter = 1000  
-learning_rate = 0.001  
+lambda_reg = abs(R) / 100 - 0.5  # Given in the question 
+alpha = np.array([1.0, 1.0]) # Taken the initial point 
+tol = 1e-4 # Tolerance factor
+max_iter = 1000  # Max number of iterations
+learning_rate = 0.001  # learning rate I have assumed this
 
 def model(x, alpha):
     return alpha[0] * x[:, 0] + np.exp(np.clip(alpha[1] * x[:, 1], -50, 50))
